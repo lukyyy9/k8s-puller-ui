@@ -150,18 +150,28 @@ function Home() {
         </label>
       </div>
 
-      <AnimatePresence initial={false}>
-        {isGraphView ? (
-          <motion.div
-            key="graph"
-          >
-            <NetworkGraph nodes={visibleNodes} edges={data.edges} />
-          </motion.div>
-        ) : (
-          <motion.div 
-            key="table"
-            className="bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden"
-          >
+      <div className="grid grid-cols-1 grid-rows-1 relative min-h-[600px]">
+        <AnimatePresence initial={false}>
+          {isGraphView ? (
+            <motion.div
+              key="graph"
+              className="col-start-1 row-start-1 w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.4 }}
+            >
+              <NetworkGraph nodes={visibleNodes} edges={data.edges} />
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="table"
+              className="col-start-1 row-start-1 w-full bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden self-start"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.4 }}
+            >
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-300 min-w-[800px]">
                 <thead className="bg-slate-900/80 uppercase text-slate-400 text-xs border-b border-slate-700/80 font-semibold">
@@ -259,6 +269,7 @@ function Home() {
       </motion.div>
       )}
       </AnimatePresence>
+      </div>
     </div>
   )
 }
