@@ -40,6 +40,7 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
   const y = useMotionValue(0);
   const scale = useMotionValue(1);
   const isDragging = useRef(false);
+  const dragDistance = useRef(0);
 
   useEffect(() => {
     setGraphData(initialGraph);
@@ -67,18 +68,18 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
     // Only drag on left click
     if (e.button !== 0) return;
     isDragging.current = true;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    dragDistance.current = 0;
   };
 
   const handlePointerMove = (e) => {
     if (!isDragging.current) return;
+    dragDistance.current += Math.abs(e.movementX) + Math.abs(e.movementY);
     x.set(x.get() + e.movementX);
     y.set(y.get() + e.movementY);
   };
 
   const handlePointerUp = (e) => {
     isDragging.current = false;
-    e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
   const getVulnerabilityColor = (metadata) => {
@@ -128,7 +129,11 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
         <motion.div
           key={node.id}
           layoutId={`node-${node.id}`}
-          onClick={() => navigate(`/services/${node.label}`)}
+          onClick={(e) => {
+            if (dragDistance.current < 5) {
+              navigate(`/services/${node.label}`);
+            }
+          }}
           className={`absolute flex flex-col items-center justify-center p-3 rounded-xl bg-slate-800 border-2 cursor-pointer shadow-lg ${getVulnerabilityColor(node.metadata)}`}
           style={{
             left: (node.x || DEFAULT_WIDTH / 2) - NODE_W / 2,
