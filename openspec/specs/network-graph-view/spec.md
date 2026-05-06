@@ -21,6 +21,22 @@ The system SHALL apply any actively set criteria from the `FilterBar` to the gra
 - **WHEN** the user types into the `FilterBar`
 - **THEN** matching nodes remain visible while non-matching nodes disappear from the layout immediately
 
+### Requirement: Interactive Graph Navigation (Pan and Zoom)
+The system SHALL allow users to navigate the network graph utilizing click-and-drag panning and mouse-wheel zooming to inspect large network topologies.
+
+#### Scenario: Panning and zooming the network graph
+- **WHEN** the user presses and drags on the graph background
+- **THEN** the entire graph pans smoothly following the pointer
+- **WHEN** the user utilizes the mouse wheel
+- **THEN** the graph scales in or out centered around the cursor position
+
+### Requirement: Drill-down from Graph Nodes
+The system SHALL allow users to click on any service node to navigate to its detailed service page.
+
+#### Scenario: Interacting with a node to see details
+- **WHEN** the user clicks on a particular node (without dragging)
+- **THEN** the system navigates to the detailed view (`/services/:serviceId`) associated with that node
+
 ### Requirement: Node Vulnerability Formatting
 The system SHALL color-code or highlight nodes within the network graph based on their associated `highestVulnerability` metadata tag.
 
