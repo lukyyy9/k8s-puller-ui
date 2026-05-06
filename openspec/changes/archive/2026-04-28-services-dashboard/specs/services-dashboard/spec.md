@@ -1,0 +1,16 @@
+## ADDED Requirements
+
+### Requirement: Application Data Table View
+The system SHALL present a tabular view of all running applications on the root user dashboard (`/` route). The table MUST display the `serviceName`, `clusterName`, `namespaceName`, `image`, and `serviceMaxCvssScore` columns.
+
+#### Scenario: Displaying running applications list
+- **WHEN** the user navigates to the root application path (`/`) after authenticating
+- **THEN** the system immediately displays a dark-styled table listing application services with mocked backend data
+
+### Requirement: CVSS Score Highlight
+The system SHALL visually format the `serviceMaxCvssScore` to indicate risk levels: scores 7.0 and up should appear red (high risk), 4.0 to 6.9 amber (medium risk), and below 4.0 green (low risk).
+
+#### Scenario: Conditional color formatting of CVSS score
+- **WHEN** the dashboard renders an application row
+- **THEN** the score's text color changes according to the established threshold rules (Red > 7.0, Amber 4.0-7.0, Green < 4.0)
+

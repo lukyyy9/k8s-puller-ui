@@ -1,0 +1,65 @@
+{
+  "changeName": "add-service-filters",
+  "changeDir": "/Users/l.buonocore/Workbench/k8s-puller-project/ui/openspec/changes/add-service-filters",
+  "schemaName": "spec-driven",
+  "contextFiles": {
+    "proposal": "/Users/l.buonocore/Workbench/k8s-puller-project/ui/openspec/changes/add-service-filters/proposal.md",
+    "specs": "/Users/l.buonocore/Workbench/k8s-puller-project/ui/openspec/changes/add-service-filters/specs/**/*.md",
+    "design": "/Users/l.buonocore/Workbench/k8s-puller-project/ui/openspec/changes/add-service-filters/design.md",
+    "tasks": "/Users/l.buonocore/Workbench/k8s-puller-project/ui/openspec/changes/add-service-filters/tasks.md"
+  },
+  "progress": {
+    "total": 9,
+    "complete": 0,
+    "remaining": 9
+  },
+  "tasks": [
+    {
+      "id": "1",
+      "description": "1.1 Create the FilterBar component structure with inputs for \"Dependency Name\" (migrating the existing one), \"Status\", \"Owner/Namespace\", and \"Cluster\".",
+      "done": false
+    },
+    {
+      "id": "2",
+      "description": "1.2 Add a \"Clear Filters\" button to reset the filter values.",
+      "done": false
+    },
+    {
+      "id": "3",
+      "description": "2.1 Add/consolidate React `useState` hooks inside App.jsx's Home view for filter criteria (dependency name, name, cluster, namespace/owner).",
+      "done": false
+    },
+    {
+      "id": "4",
+      "description": "2.2 Wire the FilterBar component to update these states when inputs change.",
+      "done": false
+    },
+    {
+      "id": "5",
+      "description": "2.3 Wire the \"Clear Filters\" button to reset the filter state objects.",
+      "done": false
+    },
+    {
+      "id": "6",
+      "description": "3.1 Implement an inline client-side filtering mechanism to derive the visible `services` list from the mock services payload before rendering the data grid.",
+      "done": false
+    },
+    {
+      "id": "7",
+      "description": "3.2 Ensure the case-insensitive string filtering works correctly for text inputs.",
+      "done": false
+    },
+    {
+      "id": "8",
+      "description": "4.1 Verify UI matches the specifications and design document constraints.",
+      "done": false
+    },
+    {
+      "id": "9",
+      "description": "4.2 Test the active filter behaviors to ensure no regressions parsing the existing grid.",
+      "done": false
+    }
+  ],
+  "state": "ready",
+  "instruction": "Read context files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification."
+}
