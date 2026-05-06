@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 import * as d3Force from 'd3-force';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,7 +36,9 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
   }, [nodes, edges]);
 
   const [graphData, setGraphData] = useState(initialGraph);
-  const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const scale = useMotionValue(1);
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -45,20 +47,20 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
 
   const handleWheel = (e) => {
     const zoomFactor = e.deltaY * 0.001;
-    setViewport((prev) => {
-      let newScale = prev.scale * (1 - zoomFactor);
-      newScale = Math.max(0.1, Math.min(4, newScale));
-      const scaleDiff = newScale / prev.scale;
+    let newScale = scale.get() * (1 - zoomFactor);
+    newScale = Math.max(0.1, Math.min(4, newScale));
+    const scaleDiff = newScale / scale.get();
 
-      const rect = containerRef.current.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-      const newX = mouseX - (mouseX - prev.x) * scaleDiff;
-      const newY = mouseY - (mouseY - prev.y) * scaleDiff;
+    const newX = mouseX - (mouseX - x.get()) * scaleDiff;
+    const newY = mouseY - (mouseY - y.get()) * scaleDiff;
 
-      return { x: newX, y: newY, scale: newScale };
-    });
+    x.set(newX);
+    y.set(newY);
+    scale.set(newScale);
   };
 
   const handlePointerDown = (e) => {
@@ -70,11 +72,8 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
 
   const handlePointerMove = (e) => {
     if (!isDragging.current) return;
-    setViewport((prev) => ({
-      ...prev,
-      x: prev.x + e.movementX,
-      y: prev.y + e.movementY,
-    }));
+    x.set(x.get() + e.movementX);
+    y.set(y.get() + e.movementY);
   };
 
   const handlePointerUp = (e) => {
@@ -101,9 +100,9 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
       onPointerLeave={handlePointerUp}
       style={{ touchAction: 'none' }}
     >
-      <div 
+      <motion.div 
         className="origin-top-left w-full h-full" 
-        style={{ transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})` }}
+        style={{ x, y, scale }}
       >
         <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none">
           {graphData.edges.map(edge => (
@@ -146,7 +145,7 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
           </div>
         </motion.div>
       ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
