@@ -92,10 +92,10 @@ export default function FilterBar({ filters, onFilterChange, onClearFilters }) {
   ];
 
   return (
-    <div className="bg-slate-800/80 border border-slate-600 rounded-2xl p-4 mb-6 shadow-md">
-      <div className="flex flex-col xl:flex-row items-end xl:items-center gap-4">
+    <div className="bg-slate-800/80 border border-slate-600 rounded-2xl p-5 shadow-md w-full">
+      <div className="flex flex-col gap-5">
         
-        <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="flex flex-col gap-4">
           <MultiSelectDropdown
             label="Cluster"
             name="cluster"
@@ -125,8 +125,8 @@ export default function FilterBar({ filters, onFilterChange, onClearFilters }) {
             />
           </div>
 
-          <div className="flex">
-            <div className="flex-2">
+          <div className="flex flex-col gap-4">
+            <div className="w-full">
               <label htmlFor="dependencyName" className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Dependency Name</label>
               <input
                 id="dependencyName"
@@ -135,10 +135,10 @@ export default function FilterBar({ filters, onFilterChange, onClearFilters }) {
                 placeholder="e.g. log4j"
                 value={filters.dependencyName || ''}
                 onChange={handleChange}
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-l-md focus:ring-2 focus:ring-[#2C4583] focus:border-transparent block py-2 px-3 outline-none transition-all placeholder:text-slate-600 h-[38px]"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-2 focus:ring-[#2C4583] focus:border-transparent block py-2 px-3 outline-none transition-all placeholder:text-slate-600 h-[38px]"
               />
             </div>
-            <div className="flex-1">
+            <div className="w-full">
               <label htmlFor="dependencyVersion" className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Version</label>
               <input
                 id="dependencyVersion"
@@ -147,17 +147,17 @@ export default function FilterBar({ filters, onFilterChange, onClearFilters }) {
                 placeholder="e.g. 2.14"
                 value={filters.dependencyVersion || ''}
                 onChange={handleChange}
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-r-md focus:ring-2 focus:ring-[#2C4583] focus:border-transparent block py-2 px-3 outline-none transition-all placeholder:text-slate-600 h-[38px]"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-md focus:ring-2 focus:ring-[#2C4583] focus:border-transparent block py-2 px-3 outline-none transition-all placeholder:text-slate-600 h-[38px]"
               />
             </div>
           </div>
         </div>
 
-        <div className="pt-2 xl:pt-0 pb-[2px]">
+        <div className="pt-2 border-t border-slate-700/80">
           <button
             type="button"
             onClick={onClearFilters}
-            className="text-sm px-4 h-[38px] rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold transition-all border border-slate-600 w-full xl:w-auto"
+            className="text-sm h-[38px] rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold transition-all border border-slate-600 w-full"
           >
             Clear Filters
           </button>

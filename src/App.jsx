@@ -123,34 +123,39 @@ function Home() {
   if (!data) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8 w-full max-w-7xl animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+    <div className="container mx-auto px-4 py-8 w-full max-w-full lg:px-8 xl:px-12 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-100">Services</h1>
           <p className="text-sm text-slate-400 mt-1">Overview of all running services in production</p>
         </div>
+        <div className="flex items-center bg-slate-800/50 p-2 rounded-xl border border-slate-700/50">
+          <span className={`mr-3 text-sm font-medium ${!isGraphView ? 'text-slate-100' : 'text-slate-500'}`}>Table</span>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              className="sr-only peer" 
+              checked={isGraphView}
+              onChange={(e) => setIsGraphView(e.target.checked)}
+            />
+            <div className="w-12 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
+          <span className={`ml-3 text-sm font-medium ${isGraphView ? 'text-slate-100' : 'text-slate-500'}`}>Graph</span>
+        </div>
       </div>
 
-      <FilterBar 
-        filters={filters} 
-        onFilterChange={handleFilterChange} 
-        onClearFilters={handleClearFilters} 
-      />
-
-      <div className="flex justify-end my-4">
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
-            className="sr-only peer" 
-            checked={isGraphView}
-            onChange={(e) => setIsGraphView(e.target.checked)}
+      <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
+        {/* Sidebar Filters */}
+        <div className="w-full lg:w-[240px] xl:w-[260px] flex-shrink-0">
+          <FilterBar 
+            filters={filters} 
+            onFilterChange={handleFilterChange} 
+            onClearFilters={handleClearFilters} 
           />
-          <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
-          <span className="ml-3 text-sm font-medium text-slate-300">Graph View</span>
-        </label>
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 grid-rows-1 relative min-h-[600px]">
+        {/* Main Content Area */}
+        <div className="flex-1 w-full grid grid-cols-1 grid-rows-1 relative min-h-[600px]">
         <AnimatePresence initial={false}>
           {isGraphView ? (
             <motion.div
@@ -269,6 +274,7 @@ function Home() {
       </motion.div>
       )}
       </AnimatePresence>
+      </div>
       </div>
     </div>
   )
