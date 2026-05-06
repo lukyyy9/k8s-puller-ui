@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import ServiceDetails from './pages/ServiceDetails'
 import ProtectedRoute from './components/ProtectedRoute'
 import TopBar from './components/TopBar'
 import FilterBar from './components/FilterBar'
+import NetworkGraph from './components/NetworkGraph'
 import { useAuth } from './hooks/useAuth'
 import { MOCK_DASHBOARD_DATA } from './mockData'
 
@@ -23,6 +25,7 @@ function Home() {
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [pageSize, setPageSize] = useState(25)
+  const [isGraphView, setIsGraphView] = useState(false)
   const [sortConfig, setSortConfig] = useState({ key: 'serviceName', direction: 'asc' })
   const [filters, setFilters] = useState({
     dependencyName: '',
@@ -71,35 +74,39 @@ function Home() {
   }
 
   // Derive visible services by filtering inline client-side
-  const visibleServices = useMemo(() => {
+  const visibleNodes = useMemo(() => {
     if (!data) return [];
-    return data.services.filter((service) => {
-      const sNameMatch = !filters.name || service.serviceName.toLowerCase().includes(filters.name.toLowerCase());
+    return data.nodes.filter((node) => {
+      const sNameMatch = !filters.name || node.label.toLowerCase().includes(filters.name.toLowerCase());
       
       // Multi-select matches (OR logic within the array if elements exist)
       const clusterMatch = filters.cluster.length === 0 || filters.cluster.some(
-        c => service.clusterName.toLowerCase().includes(c.toLowerCase())
+        c => node.cluster.toLowerCase().includes(c.toLowerCase())
       );
       
       const namespaceMatch = filters.namespace.length === 0 || filters.namespace.some(
-        n => service.namespaceName.toLowerCase().includes(n.toLowerCase())
+        n => node.namespace.toLowerCase().includes(n.toLowerCase())
       );
       
-      // Note: since mock data doesn't have dependency list, we simulate dependencyName/dependencyVersion search returning true if nothing typed
-      // In a real app, this would be matched against the service's dependencies or sent to server
-      const depMatch = !filters.dependencyName || true; // Placeholder for actual dependency filtering logic
+      const depMatch = !filters.dependencyName || true; 
       const depVersionMatch = !filters.dependencyVersion || true; 
 
       return sNameMatch && clusterMatch && namespaceMatch && depMatch && depVersionMatch;
     });
   }, [data, filters]);
 
-  const sortedVisibleServices = useMemo(() => {
-    let sortableItems = [...visibleServices];
+  const sortedVisibleNodes = useMemo(() => {
+    let sortableItems = [...visibleNodes];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+        // Handle metadata sorting for serviceMaxCvssScore
+        const aValue = sortConfig.key === 'serviceMaxCvssScore' ? a.metadata.serviceMaxCvssScore : 
+                      (sortConfig.key === 'serviceName' ? a.label : 
+                      (sortConfig.key === 'clusterName' ? a.cluster : a.namespace));
+                      
+        const bValue = sortConfig.key === 'serviceMaxCvssScore' ? b.metadata.serviceMaxCvssScore : 
+                      (sortConfig.key === 'serviceName' ? b.label : 
+                      (sortConfig.key === 'clusterName' ? b.cluster : b.namespace));
         
         if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
@@ -111,7 +118,7 @@ function Home() {
       });
     }
     return sortableItems;
-  }, [visibleServices, sortConfig]);
+  }, [visibleNodes, sortConfig]);
 
   if (!data) return null;
 
@@ -130,60 +137,93 @@ function Home() {
         onClearFilters={handleClearFilters} 
       />
 
-      <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-300 min-w-[800px]">
-            <thead className="bg-slate-900/80 uppercase text-slate-400 text-xs border-b border-slate-700/80 font-semibold">
-              <tr>
-                <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('serviceName')}>
-                  Service{getSortIcon('serviceName')}
-                </th>
-                <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('clusterName')}>
-                  Cluster{getSortIcon('clusterName')}
-                </th>
-                <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('namespaceName')}>
-                  Namespace{getSortIcon('namespaceName')}
-                </th>
-                <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('image')}>
-                  Image{getSortIcon('image')}
-                </th>
-                <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('serviceMaxCvssScore')}>
-                  Max CVSS{getSortIcon('serviceMaxCvssScore')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/50">
-              {sortedVisibleServices.map((service, idx) => (
-                <tr 
-                  key={idx} 
-                  className="hover:bg-slate-700/40 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/services/${service.serviceName}`)}
-                >
-                  <td className="py-4 px-6 font-medium text-slate-200">{service.serviceName}</td>
-                  <td className="py-4 px-6 text-slate-400">{service.clusterName}</td>
-                  <td className="py-4 px-6 text-slate-400">{service.namespaceName}</td>
-                  <td className="py-4 px-6 font-mono text-xs text-slate-400">{service.image}</td>
-                  <td className={`py-4 px-6 ${getCvssColor(service.serviceMaxCvssScore)}`}>
-                    {service.serviceMaxCvssScore.toFixed(1)}
-                  </td>
-                </tr>
-              ))}
-              
-              {visibleServices.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="py-8 text-center text-slate-500 italic">
-                    No services matched your filters
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Pagination & Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-4 sm:px-6 bg-slate-900/50 border-t border-slate-700/80">
+      <div className="flex justify-end my-4">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input 
+            type="checkbox" 
+            className="sr-only peer" 
+            checked={isGraphView}
+            onChange={(e) => setIsGraphView(e.target.checked)}
+          />
+          <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+          <span className="ml-3 text-sm font-medium text-slate-300">Graph View</span>
+        </label>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {isGraphView ? (
+          <motion.div
+            key="graph"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <NetworkGraph nodes={visibleNodes} edges={data.edges} />
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="table"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.3 }}
+            className="bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-300 min-w-[800px]">
+                <thead className="bg-slate-900/80 uppercase text-slate-400 text-xs border-b border-slate-700/80 font-semibold">
+                  <tr>
+                    <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('serviceName')}>
+                      Service{getSortIcon('serviceName')}
+                    </th>
+                    <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('clusterName')}>
+                      Cluster{getSortIcon('clusterName')}
+                    </th>
+                    <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('namespaceName')}>
+                      Namespace{getSortIcon('namespaceName')}
+                    </th>
+                    <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('image')}>
+                      Image{getSortIcon('image')}
+                    </th>
+                    <th className="py-4 px-6 whitespace-nowrap cursor-pointer hover:text-slate-200" onClick={() => requestSort('serviceMaxCvssScore')}>
+                      Max CVSS{getSortIcon('serviceMaxCvssScore')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/50">
+                  {sortedVisibleNodes.map((node, idx) => (
+                    <motion.tr 
+                      layoutId={`node-${node.id}`}
+                      key={node.id}
+                      className="hover:bg-slate-700/40 cursor-pointer"
+                      onClick={() => navigate(`/services/${node.label}`)}
+                    >
+                      <td className="py-4 px-6 font-medium text-slate-200">{node.label}</td>
+                      <td className="py-4 px-6 text-slate-400">{node.cluster}</td>
+                      <td className="py-4 px-6 text-slate-400">{node.namespace}</td>
+                      <td className="py-4 px-6 font-mono text-xs text-slate-400">{node.metadata.image}</td>
+                      <td className={`py-4 px-6 ${getCvssColor(node.metadata.serviceMaxCvssScore)}`}>
+                        {node.metadata.serviceMaxCvssScore.toFixed(1)}
+                      </td>
+                    </motion.tr>
+                  ))}
+                  
+                  {visibleNodes.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="py-8 text-center text-slate-500 italic">
+                        No services matched your filters
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination & Footer */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-4 sm:px-6 bg-slate-900/50 border-t border-slate-700/80">
           <div className="text-sm text-slate-400">
-            Showing <span className="font-semibold text-slate-200">{visibleServices.length}</span> of <span className="font-semibold text-slate-200">{data.totalElements}</span> results
+            Showing <span className="font-semibold text-slate-200">{visibleNodes.length}</span> of <span className="font-semibold text-slate-200">{data.totalElements}</span> results
           </div>
           
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
@@ -224,7 +264,9 @@ function Home() {
             </nav>
           </div>
         </div>
-      </div>
+      </motion.div>
+      )}
+      </AnimatePresence>
     </div>
   )
 }
