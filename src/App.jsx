@@ -150,24 +150,16 @@ function Home() {
         </label>
       </div>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         {isGraphView ? (
           <motion.div
             key="graph"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
           >
             <NetworkGraph nodes={visibleNodes} edges={data.edges} />
           </motion.div>
         ) : (
           <motion.div 
             key="table"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3 }}
             className="bg-slate-800/50 backdrop-blur-md rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden"
           >
             <div className="overflow-x-auto">
