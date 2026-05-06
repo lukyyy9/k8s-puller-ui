@@ -36,10 +36,51 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
   }, [nodes, edges]);
 
   const [graphData, setGraphData] = useState(initialGraph);
+  const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1 });
+  const isDragging = useRef(false);
 
   useEffect(() => {
     setGraphData(initialGraph);
   }, [initialGraph]);
+
+  const handleWheel = (e) => {
+    const zoomFactor = e.deltaY * 0.001;
+    setViewport((prev) => {
+      let newScale = prev.scale * (1 - zoomFactor);
+      newScale = Math.max(0.1, Math.min(4, newScale));
+      const scaleDiff = newScale / prev.scale;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const newX = mouseX - (mouseX - prev.x) * scaleDiff;
+      const newY = mouseY - (mouseY - prev.y) * scaleDiff;
+
+      return { x: newX, y: newY, scale: newScale };
+    });
+  };
+
+  const handlePointerDown = (e) => {
+    // Only drag on left click
+    if (e.button !== 0) return;
+    isDragging.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging.current) return;
+    setViewport((prev) => ({
+      ...prev,
+      x: prev.x + e.movementX,
+      y: prev.y + e.movementY,
+    }));
+  };
+
+  const handlePointerUp = (e) => {
+    isDragging.current = false;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  };
 
   const getVulnerabilityColor = (metadata) => {
     const v = metadata?.highestVulnerability || '';
@@ -50,9 +91,22 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[600px] bg-slate-800/20 backdrop-blur-sm rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden mt-4">
-      <svg className="absolute inset-0 w-full h-full pointer-events-none">
-        {graphData.edges.map(edge => (
+    <div 
+      ref={containerRef} 
+      className="relative w-full h-[600px] bg-slate-800/20 backdrop-blur-sm rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden mt-4 cursor-grab active:cursor-grabbing"
+      onWheel={handleWheel}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      style={{ touchAction: 'none' }}
+    >
+      <div 
+        className="origin-top-left w-full h-full" 
+        style={{ transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})` }}
+      >
+        <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none">
+          {graphData.edges.map(edge => (
           edge.source && typeof edge.source === 'object' && edge.target && typeof edge.target === 'object' ? (
             <motion.line
               key={edge.id}
@@ -92,6 +146,7 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
           </div>
         </motion.div>
       ))}
+      </div>
     </div>
   );
 }
