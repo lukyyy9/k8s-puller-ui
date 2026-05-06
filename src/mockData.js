@@ -126,17 +126,6 @@ export const MOCK_DASHBOARD_DATA = {
   ],
   "edges": [
     {
-      "id": "edge-1",
-      "source": "k8s-prod-eu-west-1:production-store:front-store",
-      "target": "k8s-prod-eu-west-1:production-finance:payment-gateway",
-      "protocol": "HTTP",
-      "port": 443,
-      "verdict": "FORWARDED",
-      "metrics": {
-        "callCount": 1450
-      }
-    },
-    {
       "id": "edge-2",
       "source": "k8s-staging-global:staging-iam:user-auth-service",
       "target": "k8s-prod-eu-west-1:production-finance:payment-gateway",
@@ -145,6 +134,127 @@ export const MOCK_DASHBOARD_DATA = {
       "verdict": "DROPPED",
       "metrics": {
         "callCount": 12
+      }
+    },
+    {
+      "id": "edge-3",
+      "source": "k8s-prod-eu-west-1:production-store:front-store",
+      "target": "k8s-prod-eu-west-1:production-store:search-service",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "DROPPED",
+      "metrics": {
+        "callCount": 3200
+      }
+    },
+    {
+      "id": "edge-4",
+      "source": "k8s-prod-eu-west-1:production-store:front-store",
+      "target": "k8s-prod-eu-west-1:production-store:inventory-service",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 2800
+      }
+    },
+    {
+      "id": "edge-5",
+      "source": "k8s-prod-eu-west-1:production-store:inventory-service",
+      "target": "k8s-prod-eu-west-1:production-logistics:shipping-service",
+      "protocol": "HTTP",
+      "port": 8080,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 650
+      }
+    },
+    {
+      "id": "edge-6",
+      "source": "k8s-prod-eu-west-1:production-finance:payment-gateway",
+      "target": "k8s-prod-eu-west-1:production-core:notification-service",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 1200
+      }
+    },
+    {
+      "id": "edge-7",
+      "source": "k8s-prod-eu-west-1:production-store:search-service",
+      "target": "k8s-prod-eu-west-1:production-ai:recommendation-engine",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "DROPPED",
+      "metrics": {
+        "callCount": 890
+      }
+    },
+    {
+      "id": "edge-8",
+      "source": "k8s-prod-eu-west-1:production-store:front-store",
+      "target": "k8s-prod-eu-west-1:production-data:analytics-worker",
+      "protocol": "HTTP",
+      "port": 8080,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 5600
+      }
+    },
+    {
+      "id": "edge-9",
+      "source": "k8s-prod-eu-west-1:production-logistics:shipping-service",
+      "target": "k8s-prod-eu-west-1:production-core:notification-service",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 420
+      }
+    },
+    {
+      "id": "edge-10",
+      "source": "k8s-prod-eu-west-1:production-ai:recommendation-engine",
+      "target": "k8s-prod-eu-west-1:production-data:analytics-worker",
+      "protocol": "HTTP",
+      "port": 8080,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 1100
+      }
+    },
+    {
+      "id": "edge-11",
+      "source": "k8s-prod-eu-west-1:production-support:customer-support-api",
+      "target": "k8s-staging-global:staging-iam:user-auth-service",
+      "protocol": "HTTP",
+      "port": 443,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 340
+      }
+    },
+    {
+      "id": "edge-12",
+      "source": "k8s-prod-eu-west-1:production-store:search-service",
+      "target": "k8s-prod-eu-west-1:production-data:analytics-worker",
+      "protocol": "HTTP",
+      "port": 8080,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 2100
+      }
+    },
+    {
+      "id": "edge-13",
+      "source": "k8s-prod-eu-west-1:production-store:inventory-service",
+      "target": "k8s-prod-eu-west-1:production-data:analytics-worker",
+      "protocol": "HTTP",
+      "port": 8080,
+      "verdict": "FORWARDED",
+      "metrics": {
+        "callCount": 780
       }
     }
   ]

@@ -92,7 +92,7 @@ export default function NetworkGraph({ nodes = [], edges = [] }) {
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full h-[600px] bg-slate-800/20 backdrop-blur-sm rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden mt-4 cursor-grab active:cursor-grabbing"
+      className="relative w-full h-[600px] bg-slate-800/20 backdrop-blur-sm rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing"
       onWheel={handleWheel}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
